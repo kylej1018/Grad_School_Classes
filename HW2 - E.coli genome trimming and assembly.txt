@@ -1,0 +1,94 @@
+(Setup)
+bash
+mkdir ~/work
+cd ~/work
+
+(Instal Trimmomatic)
+sudo apt-get -y install trimmomatic
+wget https://anonscm.debian.org/cgit/debian-med/trimmomatic.git/plain/adapters/TruSeq3-PE.fa
+
+(Retrieve E.coli genome)
+curl -O -L https://s3.amazonaws.com/public.ged.msu.edu/ecoli_ref-5m.fastq.gz
+
+(Install khmer)
+pip install khmer==2.0
+
+(Split paired-end E.coli into left and right reads)
+gunzip -c ecoli_ref-5m.fastq.gz | head -400000 | split-paired-reads.py -1 top.R1.fq -2 top.R2.fq
+
+(Run Trimmomatic)
+TrimmomaticPE top.R1.fq top.R2.fq out-r1 orphan1 out-r2 orphan2 ILLUMINACLIP:TruSeq3-E.fa:2:40:15 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:2 MINLEN:25
+
+(Interleave trimmed reads)
+interleave-reads.py out-r1 out-r2 > top-pe.fq
+
+(Install Megahit)
+git clone https://github.com/voutcn/megahit.git
+cd megahit
+make -j 4
+
+(Run and save Megahit)
+~/work/megahit/megahit --12 top-pe.fq -o ecoli
+cp ecoli/final.contigs.fa ecoli-assembly.fa
+
+(Install Quast)
+cd ~/
+git clone https://github.com/ablab/quast.git -b release_4.2
+export PYTHONPATH=$(pwd)/quast/libs/
+
+(Run Quast)
+cd ~/work
+~/quast/quast.py ecoli-assembly.fa -o ecoli_report
+python2.7 ~/quast/quast.py ecoli-assembly.fa -o ecoli_report
+
+
+
+The trimmed reads contained a lot more smaller contigs, none greater than 10000 bp, but over 2500 total.  The total length of the contigs is far smaller (1 million bp as opposed to 4.5), indicating that 75% of the genome was removed with the trimming of the reads.  There are 876 contigs now instead of 102, but the longest is 6488 bp instead of 246618 bp with an N50 of 663 instead of 53842.
+
+Untrimmed:
+Assembly                    ecoli-assembly
+# contigs (>= 0 bp)         117           
+# contigs (>= 1000 bp)      93            
+# contigs (>= 5000 bp)      69            
+# contigs (>= 10000 bp)     64            
+# contigs (>= 25000 bp)     52            
+# contigs (>= 50000 bp)     32            
+Total length (>= 0 bp)      4577284       
+Total length (>= 1000 bp)   4566196       
+Total length (>= 5000 bp)   4508252       
+Total length (>= 10000 bp)  4471041       
+Total length (>= 25000 bp)  4296074       
+Total length (>= 50000 bp)  3578894       
+# contigs                   102           
+Largest contig              246618        
+Total length                4572412       
+GC (%)                      50.74         
+N50                         105708        
+N75                         53842         
+L50                         15            
+L75                         30            
+# N's per 100 kbp           0.00          
+
+Trimmed:
+Assembly                    ecoli-assembly
+# contigs (>= 0 bp)         2751          
+# contigs (>= 1000 bp)      68            
+# contigs (>= 5000 bp)      1             
+# contigs (>= 10000 bp)     0             
+# contigs (>= 25000 bp)     0             
+# contigs (>= 50000 bp)     0             
+Total length (>= 0 bp)      1321694       
+Total length (>= 1000 bp)   90531         
+Total length (>= 5000 bp)   6488          
+Total length (>= 10000 bp)  0             
+Total length (>= 25000 bp)  0             
+Total length (>= 50000 bp)  0             
+# contigs                   876           
+Largest contig              6488          
+Total length                608056        
+GC (%)                      49.09         
+N50                         663           
+N75                         568           
+L50                         342           
+L75                         590           
+# N's per 100 kbp           0.00          

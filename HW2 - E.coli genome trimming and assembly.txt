@@ -3,7 +3,7 @@ bash
 mkdir ~/work
 cd ~/work
 
-(Instal Trimmomatic)
+(Install Trimmomatic)
 sudo apt-get -y install trimmomatic
 wget https://anonscm.debian.org/cgit/debian-med/trimmomatic.git/plain/adapters/TruSeq3-PE.fa
 
@@ -42,8 +42,10 @@ cd ~/work
 python2.7 ~/quast/quast.py ecoli-assembly.fa -o ecoli_report
 
 
-
-The trimmed reads contained a lot more smaller contigs, none greater than 10000 bp, but over 2500 total.  The total length of the contigs is far smaller (1 million bp as opposed to 4.5), indicating that 75% of the genome was removed with the trimming of the reads.  There are 876 contigs now instead of 102, but the longest is 6488 bp instead of 246618 bp with an N50 of 663 instead of 53842.
+The trimmed reads contained a lot more smaller contigs, none greater than 10000 bp, but over 2500 total.
+The total length of the contigs is far smaller (1 million bp as opposed to 4.5), indicating that 75% of
+the genome was removed with the trimming of the reads.  There are 876 contigs now instead of 102, but the
+longest is 6488 bp instead of 246618 bp with an N50 of 663 instead of 53842.
 
 Untrimmed:
 Assembly                    ecoli-assembly

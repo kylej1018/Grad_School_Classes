@@ -10,7 +10,7 @@ files <- c(
 "ERR458501.fastq.gz.quant.counts",
 "ERR458502.fastq.gz.quant.counts",
 "ERR458505.fastq.gz.quant.counts",
-"ERR458506.fastq.gz.quant.counts",
+"ERR458506.fastq.gz.quant.counts"
 )
 
 labels=c("WT1", "WT2", "WT3", "WT6", "WT7", "SNF21", "SNF22", "SNF23",  "SNF26", "SNF27")

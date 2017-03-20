@@ -5,7 +5,7 @@
 
 bash
 
-#Install edgeR:
+o#Install edgeR:
 cd
 git clone https://github.com/ctb/2017-ucdavis-igg201b.git
 sudo Rscript --no-save ~/2017-ucdavis-igg201b/lab7/install-edgeR.R
@@ -15,7 +15,7 @@ cd
 curl -L -O https://github.com/COMBINE-lab/salmon/releases/download/v0.8.0/Salmon-0.8.0_linux_x86_64.tar.gz
 tar xzf Salmon-0.8.0_linux_x86_64.tar.gz
 export PATH=$PATH:$HOME/Salmon-latest_linux_x86_64/bin
-
+C
 #Make a working directory:
 mkdir hw3
 cd hw3
@@ -68,5 +68,5 @@ Rscript --no-save ~/hw3/Grad_School_Classes/yeast.salmon.R
 #The ‘group’ list now identifies the first five files as wt and the second five as mut for 5; this is not only expanded but also reversed from the sample script, done so to match the order of files in the ‘files’ list.
 #See the yeast.salmon.R file in this github repository for the complete code.
 
-#In the class data, there were 3464 genes that met the cutoff score for FDR, but in my data, there were only 2676 genes, meaning that 798 genes were lost.  The overall p-values and FDR scores for my data tended to be higher than the class data, as suggested by the median FDR score, which was .002790 for my data and .000100 for the class data.  This skew could be explained by looking at the MDS plot.  The WT in lane 6 had a low Leading logFC dim 2 score of -.8, while the next lowest was 0.2, and I suspect this may have thrown off the data by introducing even larger variability to a series of values that were already dissimilar compared to the SNF2 data.
+#Conclusions: In the class data, there were 3464 genes that met the cutoff score for FDR, but in my data, there were only 2676 genes, meaning that 798 genes were lost.  The overall p-values and FDR scores for my data tended to be higher than the class data, as suggested by the median FDR score, which was .002790 for my data and .000100 for the class data.  This skew could be explained by looking at the MDS plot.  The WT in lane 6 had a low Leading logFC dim 2 score of -.8, while the next lowest was 0.2, and I suspect this may have thrown off the data by introducing even larger variability to a series of values that were already dissimilar compared to the SNF2 data.
 #See the yeast-edgeR.csv file in this github repository for the complete results.

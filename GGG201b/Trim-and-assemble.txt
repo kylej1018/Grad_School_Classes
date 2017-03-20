@@ -1,1 +1,72 @@
-edit me
+#GGG201B Homework 3: Expanding the RNA-seq Analysis
+#This document contains a shell script that can be run in an Amazon Web Instance (EC2).  I used an m4.xlarge whose community AMI linked to a Jupyter notebook.
+#This script is intended to evaluate the alteration of gene expression in yeast at a level of FDR = .001
+#All due credit to ctb and his github; code used with permission.
+
+bash
+
+#Install edgeR:
+cd
+git clone https://github.com/ctb/2017-ucdavis-igg201b.git
+sudo Rscript --no-save ~/2017-ucdavis-igg201b/lab7/install-edgeR.R
+
+#Install Salmon:
+cd
+curl -L -O https://github.com/COMBINE-lab/salmon/releases/download/v0.8.0/Salmon-0.8.0_linux_x86_64.tar.gz
+tar xzf Salmon-0.8.0_linux_x86_64.tar.gz
+export PATH=$PATH:$HOME/Salmon-latest_linux_x86_64/bin
+
+#Make a working directory:
+mkdir hw3
+cd hw3
+
+#Download expression data from Schurch et al, 2016:
+#WT from class (lanes 1, 2, and 3):
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458493/ERR458493.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458494/ERR458494.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458495/ERR458495.fastq.gz
+
+#SNF2 mutant from class (lanes 1, 2, and 3):
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458500/ERR458500.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458501/ERR458501.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458502/ERR458502.fastq.gz
+
+
+#WT of my choice (lanes 6 and 7):
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458498/ERR458498.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458499/ERR458499.fastq.gz
+
+#SNF2 mutant of my choice (lanes 6 and 7):
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458505/ERR458505.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458506/ERR458506.fastq.gz
+
+#It was necessary to only use data from the first biological replicates because other attempts produced the response:
+#curl: (9) Server denied you to change to the given directory
+
+#Download the yeast reference transcriptome:
+curl -O http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding.fasta.gz
+
+#Index the yeast transcriptome:
+salmon index --index yeast_orfs --type quasi --transcripts orf_coding.fasta.gz
+
+#Run Salmon on all the samples:
+for i in *.fastq.gz
+do
+    salmon quant -i yeast_orfs --libType U -r $i -o $i.quant --seqBias --gcBias
+done
+
+#Collect all of the sample counts:
+curl -L -O https://github.com/ngs-docs/2016-aug-nonmodel-rnaseq/raw/master/files/gather-counts.py
+python2 gather-counts.py
+
+#Run updated edgeR obtained from my github:
+git clone https://github.com/kylej1018/Grad_School_Classes
+Rscript --no-save ~/hw3/Grad_School_Classes/yeast.salmon.R
+#Note that this script was updated from the original class master file in the following ways:
+#The ‘files’ list now includes all fastq counts files, including those of my choice.
+#A new labelling system for the MDS plot was implemented, where each data point was identified as WT or SNF2, along with the lane number.
+#The ‘group’ list now identifies the first five files as wt and the second five as mut for 5; this is not only expanded but also reversed from the sample script, done so to match the order of files in the ‘files’ list.
+#See the yeast.salmon.R file in this github repository for the complete code.
+
+#In the class data, there were 3464 genes that met the cutoff score for FDR, but in my data, there were only 2676 genes, meaning that 798 genes were lost.  The overall p-values and FDR scores for my data tended to be higher than the class data, as suggested by the median FDR score, which was .002790 for my data and .000100 for the class data.  This skew could be explained by looking at the MDS plot.  The WT in lane 6 had a low Leading logFC dim 2 score of -.8, while the next lowest was 0.2, and I suspect this may have thrown off the data by introducing even larger variability to a series of values that were already dissimilar compared to the SNF2 data.
+#See the yeast-edgeR.csv file in this github repository for the complete results.

@@ -10,17 +10,25 @@ files <- c(
 
 "ERR458495.fastq.gz.quant.counts",
 
+"ERR458498.fastq.gz.quant.counts",
+
+"ERR458499.fastq.gz.quant.counts",
+
 "ERR458500.fastq.gz.quant.counts",
 
 "ERR458501.fastq.gz.quant.counts",
 
 "ERR458502.fastq.gz.quant.counts"
 
+"ERR458505.fastq.gz.quant.counts",
+
+"ERR458506.fastq.gz.quant.counts",
+
 )
 
 
 
-labels=c("A", "B", "E", "C", "D", "F")
+labels=c("WT1", "WT2", "WT3", "WT6", "WT7", "SNF21", "SNF22", "SNF23",  "SNF26", "SNF27")
 
 
 
@@ -36,7 +44,7 @@ print(data)
 
 
 
-group <- c(rep("mut", 3), rep("wt", 3))
+group <- c(rep("wt", 5), rep("mut", 5))
 
 
 
